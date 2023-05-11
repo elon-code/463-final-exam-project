@@ -30,27 +30,33 @@ Qdot_fins = ureg.Quantity(np.array([None, None, None, None, None, None]), W) # f
 mdot_air = ureg.Quantity(np.array([None, None, None, None, None, None]), kg/s) # mass flow rate of air
 mdot_fuel = ureg.Quantity(np.array([5.55E-05, 5.64E-05, 6.83E-05, 8.26E-05, 0.000104, 0.000118]), kg / s) # mass flow rate of fuel
 deltaT = ureg.Quantity(np.array([247, 247, 247, 291, 330, 350]), K) # temperature difference
-
 #constants
 rho_air = 1.2 * ureg.kilogram / ureg.meter**3
 Cp_air = 1.006 * ureg.kilojoule / (ureg.kilogram * ureg.kelvin)
 LHV_gas = 45.2 * ureg.kilojoule / ureg.gram
 #calculations
-D = 10e-4 * m**3 # displacement of the engine
+D = 10**-4 * m**3 # displacement of the engine
 mdot_air = (rho_air * D * speed) / (2*turns) # The 2 is present in the denominator because engine will only draw air every second revolution
 mdot_air = mdot_air.to(kg / s)
+print(mdot_air)
 Qdot_exhaust = mdot_air * Cp_air * deltaT
+print(Qdot_exhaust)
 Qdot_in = mdot_fuel * LHV_gas
 Qdot_in = Qdot_in.to(W)
+print(Qdot_in)
 Qdot_shaft = speed*torque
 Qdot_shaft = Qdot_shaft.to(W)
+print(Qdot_shaft)
 Qdot_fins = Qdot_in - Qdot_exhaust - Qdot_shaft
+print(Qdot_fins)
 efficiency = (Qdot_shaft / Qdot_in)*100 # n_th percent
+print(efficiency)
 bsfc = mdot_fuel / Qdot_shaft
 bsfs = bsfc.to(g / (W * hr))
-MEP = (4 * np.pi * torque / D)
+print(bsfc)
+MEP = (4 * np.pi * torque )/ D
 MEP = MEP.to(kPa)
-
+print(MEP)
 # Create a dictionary with the column names and data
 data = {
     'Speed (RPM)': speed.magnitude,
@@ -62,13 +68,11 @@ data = {
     'BSFC (g/(W*h))': bsfc.magnitude,
     'Exhaust Heat (W)': Qdot_exhaust.magnitude,
     'Fins Heat (W)': Qdot_fins.magnitude,
-    'Air Mass Flow (g/s)': mdot_air.magnitude,
-    'Fuel Mass Flow (g/s)': mdot_fuel.magnitude,
+    'Air Mass Flow (kg/s)': mdot_air.magnitude,
+    'Fuel Mass Flow (kg/s)': mdot_fuel.magnitude,
     'Delta T (delta_K)': deltaT.magnitude
 }
 
-# Create a DataFrame from the dictionary
+# Create a DataFrame from the dictionary and add a caption
 df = pd.DataFrame(data)
-
-# Display the DataFrame in a nice table
 df
