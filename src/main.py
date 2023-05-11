@@ -48,7 +48,7 @@ Qdot_fins = Qdot_in - Qdot_exhaust - Qdot_shaft
 efficiency = (Qdot_shaft / Qdot_in)*100 # n_th percent
 bsfc = mdot_fuel / Qdot_shaft
 bsfs = bsfc.to(g / (W * hr))
-MEP = 4 * np.pi * (torque / D)
+MEP = (4 * np.pi * torque / D)
 MEP = MEP.to(kPa)
 
 # Create a dictionary with the column names and data
