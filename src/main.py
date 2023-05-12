@@ -76,3 +76,55 @@ data = {
 # Create a DataFrame from the dictionary and add a caption
 df = pd.DataFrame(data)
 df
+
+# Calculation Set B
+#variable array setup
+percent_load = np.array([0.75, 1, 1.25, 1.5, 1.75, 2]) # percent
+torque = ureg.Quantity(np.array([1.35, 1.8, None, None, None, None]), N * m)
+Qdot_shaft = ureg.Quantity(np.array([None, None, None, None, None, None]), W) # Qdot_shaft
+Qdot_in = ureg.Quantity(np.array([None, None, None, None, None, None]), W) # heat input
+efficiency = np.array([None, None, None, None, None, None]) # n_th percent
+MEP = ureg.Quantity(np.array([169.64, 226.19, None, None, None, None]), kPa) # mean effective pressure
+bsfc = ureg.Quantity(np.array([None, None, None, None, None, None]), g / (W * hr)) # brake specific fuel consumption
+Qdot_exhaust = ureg.Quantity(np.array([None, None, None, None, None, None]), W) # exhaust heat
+Qdot_fins = ureg.Quantity(np.array([None, None, None, None, None, None]), W) # fins heat
+mdot_air = ureg.Quantity(np.array([None, None, None, None, None, None]), kg/s) # mass flow rate of air
+mdot_fuel = ureg.Quantity(np.array([4.931E-05, 5.547E-05, 8.452E-05, 8.452E-05, 9.342E-05, 0.000118]), kg / s) # mass flow rate of fuel
+deltaT = ureg.Quantity(np.array([235, 247, 250, 288, 314, 345]), K) # temperature difference
+
+#given value
+speed = 1500 * rpm # speed of the engine: given 1500 rpm
+
+mdot_air = (rho_air * D * speed) / (2*turns) # The 2 is present in the denominator because engine will only draw air every second revolution
+mdot_air = mdot_air.to(kg / s)
+Qdot_exhaust = mdot_air * Cp_air * deltaT
+Qdot_in = mdot_fuel * LHV_gas
+Qdot_in = Qdot_in.to(W)
+Qdot_shaft = speed*torque
+Qdot_shaft = Qdot_shaft.to(W)
+Qdot_fins = Qdot_in - Qdot_exhaust - Qdot_shaft
+efficiency = (Qdot_shaft / Qdot_in)*100 # n_th percent
+bsfc = mdot_fuel / Qdot_shaft
+bsfs = bsfc.to(g / (W * hr))
+MEP = (4 * np.pi * torque )/ D
+MEP = MEP.to(kPa)
+
+# Create a dictionary with the column names and data
+data = {
+    'Speed (RPM)': speed.magnitude,
+    'Torque (N m)': torque.magnitude,
+    'Power Shaft (W)': Qdot_shaft.magnitude,
+    'Power Input (W)': Qdot_in.magnitude,
+    'Efficiency (%)': efficiency.magnitude,
+    'MEP (kPa)': MEP.magnitude,
+    'BSFC (g/(W*h))': bsfc.magnitude,
+    'Exhaust Heat (W)': Qdot_exhaust.magnitude,
+    'Fins Heat (W)': Qdot_fins.magnitude,
+    'Air Mass Flow (kg/s)': mdot_air.magnitude,
+    'Fuel Mass Flow (kg/s)': mdot_fuel.magnitude,
+    'Delta T (delta_K)': deltaT.magnitude
+}
+
+# Create a DataFrame from the dictionary and add a caption
+df = pd.DataFrame(data)
+df
